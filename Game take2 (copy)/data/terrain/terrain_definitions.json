@@ -1,0 +1,166 @@
+{
+  "village_clearing": {
+    "tags": [],
+    "terrain_class": "ground",
+    "move_cost": 1,
+    "blocks_movement": false,
+    "blocks_los": false,
+    "cover": false,
+    "hazard": false,
+    "region_group": "dry_ground",
+    "visual_roles": ["clearing", "settlement_core", "paint_base"],
+    "paint_layers": ["grass_base", "light_mud_breakup"],
+    "detail_rules": {
+      "clutter_density": 0.25,
+      "allow_small_flowers": true,
+      "allow_stepping_stones": false
+    }
+  },
+
+  "boardwalk": {
+    "tags": ["path"],
+    "terrain_class": "structure",
+    "move_cost": 1,
+    "blocks_movement": false,
+    "blocks_los": false,
+    "cover": false,
+    "hazard": false,
+    "region_group": "boardwalk",
+    "visual_roles": ["wood_path", "settlement_link", "paint_overlay"],
+    "paint_layers": ["wood_walkway"],
+    "detail_rules": {
+      "clutter_density": 0.1,
+      "allow_moss_edges": true,
+      "allow_rope_posts": true
+    }
+  },
+
+  "hut_platform": {
+    "tags": ["structure"],
+    "terrain_class": "structure",
+    "move_cost": 1,
+    "blocks_movement": false,
+    "blocks_los": false,
+    "cover": false,
+    "hazard": false,
+    "region_group": "settlement",
+    "visual_roles": ["hut_base", "platform", "settlement_edge"],
+    "paint_layers": ["packed_earth", "wood_foundation"],
+    "detail_rules": {
+      "clutter_density": 0.15,
+      "allow_support_posts": true,
+      "allow_roof_anchor": true
+    }
+  },
+
+  "marsh_grass": {
+    "tags": ["difficult"],
+    "terrain_class": "wet_ground",
+    "move_cost": 2,
+    "blocks_movement": false,
+    "blocks_los": false,
+    "cover": false,
+    "hazard": false,
+    "region_group": "wet_ground",
+    "visual_roles": ["wet_grass", "mud_transition", "paint_base"],
+    "paint_layers": ["wet_grass", "mud_breakup"],
+    "detail_rules": {
+      "clutter_density": 0.45,
+      "allow_reeds": false,
+      "allow_mushroom_patches": false
+    }
+  },
+
+  "mud_flat": {
+    "tags": ["difficult"],
+    "terrain_class": "wet_ground",
+    "move_cost": 2,
+    "blocks_movement": false,
+    "blocks_los": false,
+    "cover": false,
+    "hazard": false,
+    "region_group": "mud",
+    "visual_roles": ["mud_flat", "paint_base"],
+    "paint_layers": ["mud_flat", "small_puddles"],
+    "detail_rules": {
+      "clutter_density": 0.2,
+      "allow_footprints": true,
+      "allow_pebbles": true
+    }
+  },
+
+  "reed_bank": {
+    "tags": ["cover"],
+    "terrain_class": "wet_edge",
+    "move_cost": 2,
+    "blocks_movement": false,
+    "blocks_los": false,
+    "cover": true,
+    "hazard": false,
+    "region_group": "wet_edge",
+    "visual_roles": ["shoreline_candidate", "reeds", "cover_foliage"],
+    "paint_layers": ["wet_grass", "shoreline_darkening"],
+    "detail_rules": {
+      "clutter_density": 0.65,
+      "allow_reeds": true,
+      "allow_cattails": true,
+      "allow_lily_edge_decor": true
+    }
+  },
+
+  "shallow_water": {
+    "tags": ["water"],
+    "terrain_class": "water",
+    "move_cost": 2,
+    "blocks_movement": false,
+    "blocks_los": false,
+    "cover": false,
+    "hazard": false,
+    "region_group": "water",
+    "visual_roles": ["water", "lily_candidate", "shoreline_candidate"],
+    "paint_layers": ["water_shallow"],
+    "detail_rules": {
+      "clutter_density": 0.35,
+      "allow_lily_pads": true,
+      "allow_ripples": true,
+      "allow_reflections": true
+    }
+  },
+
+  "deep_water": {
+    "tags": ["water", "blocked"],
+    "terrain_class": "water",
+    "move_cost": 999,
+    "blocks_movement": true,
+    "blocks_los": false,
+    "cover": false,
+    "hazard": false,
+    "region_group": "water",
+    "visual_roles": ["deep_water", "lily_candidate"],
+    "paint_layers": ["water_deep"],
+    "detail_rules": {
+      "clutter_density": 0.15,
+      "allow_lily_pads": false,
+      "allow_ripples": true,
+      "allow_reflections": true
+    }
+  },
+
+  "stone_plinth": {
+    "tags": ["cover"],
+    "terrain_class": "stone",
+    "move_cost": 1,
+    "blocks_movement": false,
+    "blocks_los": false,
+    "cover": true,
+    "hazard": false,
+    "region_group": "stone",
+    "visual_roles": ["stone_feature", "village_landmark"],
+    "paint_layers": ["stone_base", "moss_edge"],
+    "detail_rules": {
+      "clutter_density": 0.05,
+      "allow_moss": true,
+      "allow_carvings": true
+    }
+  }
+}

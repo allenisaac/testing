@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bgxaickaoy1wd"]
+
+[ext_resource type="Script" uid="uid://253p6qk4onpy" path="res://scripts/core/board_controller.gd" id="1_6puts"]
+
+[node name="Board" type="Node2D" unique_id=1716510498]
+script = ExtResource("1_6puts")
+
+[node name="TerrainLayer" type="Node2D" parent="." unique_id=1051100839]
+
+[node name="DebugLayer" type="Node2D" parent="." unique_id=1272684023]
+
+[node name="UnitsLayer" type="Node2D" parent="." unique_id=313006022]
+
+[node name="CanvasLayer" type="Node2D" parent="." unique_id=747051689]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1541934776]

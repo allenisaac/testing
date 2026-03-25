@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://b3igddh5ttfs1"]
+
+[node name="Board3DRoot" type="Node3D" unique_id=207679478]
+
+[node name="TerrainChunks" type="Node3D" parent="." unique_id=1134097106]
+
+[node name="WaterRegion" type="Node3D" parent="." unique_id=10051433]
+
+[node name="Props" type="Node3D" parent="." unique_id=2113029879]
+
+[node name="Features" type="Node3D" parent="." unique_id=1566435617]
+
+[node name="DebugField" type="Node3D" parent="." unique_id=1749099760]
+
+[node name="GeneratedTerrain" type="MeshInstance3D" parent="." unique_id=580408403]
+
+[node name="GeneratedWater" type="MeshInstance3D" parent="." unique_id=1456131912]
+
+[node name="GrassLayer" type="Node3D" parent="." unique_id=943104786]
+
+[node name="GameplayOverlayAnchor" type="Node3D" parent="." unique_id=541170416]
+
+[node name="ShaderGlobals" type="Node" parent="." unique_id=858860692]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1694289533]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2076192027]
+transform = Transform3D(0.7260468, -0.13286965, 0.6746863, 0, 0.98115474, 0.19322415, -0.6876453, -0.14028977, 0.71236426, 5.753893, 5.1419907, 5.3388443)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=368462095]
+transform = Transform3D(0.92998195, -0.14314447, 0.33859006, 0.020315304, 0.93967515, 0.34146437, -0.36704338, -0.31067714, 0.876789, 6.2284036, 1.4866205, 7.1881886)
+projection = 1
+size = 3.786

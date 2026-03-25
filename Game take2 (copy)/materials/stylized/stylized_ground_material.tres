@@ -1,0 +1,29 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dyq15iy72rclu"]
+
+[ext_resource type="Shader" uid="uid://dnd4bn7fvinva" path="res://shaders/stylized/stylized_ground.gdshader" id="1_mba6l"]
+[ext_resource type="Texture2D" uid="uid://vqml4pj02ucs" path="res://assets/Albedo2Noise.tres" id="2_qa1jh"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_mba6l")
+shader_parameter/control_map = ExtResource("2_qa1jh")
+shader_parameter/field_min_xz = Vector2(-100, -100)
+shader_parameter/field_max_xz = Vector2(100, 100)
+shader_parameter/grass_color_a = Color(0.33, 0.53, 0.22, 1)
+shader_parameter/grass_color_b = Color(0.45, 0.65, 0.3, 1)
+shader_parameter/mud_color_a = Color(0.34, 0.24, 0.14, 1)
+shader_parameter/mud_color_b = Color(0.46, 0.33, 0.2, 1)
+shader_parameter/clearing_color_a = Color(0.52, 0.48, 0.28, 1)
+shader_parameter/clearing_color_b = Color(0.64, 0.58, 0.34, 1)
+shader_parameter/wet_tint_color = Color(0.18, 0.28, 0.18, 1)
+shader_parameter/wet_tint_strength = 0.082000003895
+shader_parameter/patch_noise_scale = 0.08
+shader_parameter/patch_noise_strength = 0.18
+shader_parameter/zone_edge_noise_scale = 0.11
+shader_parameter/zone_blend_strength = 0.18
+shader_parameter/secondary_blend_threshold = 0.12
+shader_parameter/light_wrap = 0.25
+shader_parameter/shadow_strength = 0.75
+shader_parameter/roughness_value = 1.0
+shader_parameter/cel_steps = 3
+shader_parameter/cel_softness = 0.010000000475

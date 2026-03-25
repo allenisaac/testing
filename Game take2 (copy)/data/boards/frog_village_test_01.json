@@ -1,0 +1,85 @@
+{
+  "id": "frog_village_test_01",
+  "biome_id": "frog_marsh_village",
+  "seed": 12345,
+
+  "board_shape": {
+    "type": "radius",
+    "radius": 5
+  },
+
+  "visual_style": {
+    "camera_mode": "isometric_painted",
+    "hex_overlay": true,
+    "hex_overlay_opacity": 0.3,
+    "show_tile_debug": false
+  },
+
+  "tiles": [
+    { "coord": [0, 0], "terrain_id": "village_clearing" },
+    { "coord": [1, 0], "terrain_id": "boardwalk" },
+    { "coord": [1, -1], "terrain_id": "boardwalk" },
+    { "coord": [0, -1], "terrain_id": "village_clearing" },
+    { "coord": [-1, 0], "terrain_id": "village_clearing" },
+    { "coord": [-1, 1], "terrain_id": "boardwalk" },
+    { "coord": [0, 1], "terrain_id": "boardwalk" },
+
+    { "coord": [2, 0], "terrain_id": "hut_platform" },
+    { "coord": [2, -1], "terrain_id": "hut_platform" },
+    { "coord": [1, 1], "terrain_id": "hut_platform" },
+    { "coord": [-2, 1], "terrain_id": "hut_platform" },
+    { "coord": [-1, 2], "terrain_id": "hut_platform" },
+
+    { "coord": [2, 1], "terrain_id": "reed_bank" },
+    { "coord": [3, 0], "terrain_id": "shallow_water" },
+    { "coord": [3, -1], "terrain_id": "shallow_water" },
+    { "coord": [2, -2], "terrain_id": "shallow_water" },
+    { "coord": [1, -2], "terrain_id": "reed_bank" },
+
+    { "coord": [0, 2], "terrain_id": "marsh_grass" },
+    { "coord": [1, 2], "terrain_id": "reed_bank" },
+    { "coord": [2, 2], "terrain_id": "shallow_water" },
+    { "coord": [3, 1], "terrain_id": "deep_water" },
+
+    { "coord": [-2, 2], "terrain_id": "marsh_grass" },
+    { "coord": [-3, 2], "terrain_id": "reed_bank" },
+    { "coord": [-3, 3], "terrain_id": "shallow_water" },
+    { "coord": [-2, 3], "terrain_id": "shallow_water" },
+
+    { "coord": [-2, 0], "terrain_id": "mud_flat" },
+    { "coord": [-3, 1], "terrain_id": "marsh_grass" },
+    { "coord": [-4, 2], "terrain_id": "shallow_water" },
+
+    { "coord": [0, -2], "terrain_id": "mud_flat" },
+    { "coord": [-1, -1], "terrain_id": "village_clearing" },
+    { "coord": [-2, -1], "terrain_id": "marsh_grass" },
+    { "coord": [-3, 0], "terrain_id": "reed_bank" },
+
+    { "coord": [4, 0], "terrain_id": "deep_water" },
+    { "coord": [4, -1], "terrain_id": "deep_water" },
+    { "coord": [4, 1], "terrain_id": "shallow_water" }
+  ],
+
+  "anchors": [
+    {
+      "anchor_id": "central_plaza",
+      "coord": [0, 0],
+      "radius": 2
+    },
+    {
+      "anchor_id": "pond_cluster_east",
+      "coord": [3, 0],
+      "radius": 2
+    },
+    {
+      "anchor_id": "housing_cluster_west",
+      "coord": [-1, 1],
+      "radius": 2
+    }
+  ],
+
+  "entities": [
+    { "type": "player_spawn", "coord": [0, 0], "id": "player_spawn_a" },
+    { "type": "enemy_spawn", "coord": [4, 0], "id": "enemy_spawn_a" }
+  ]
+}
