@@ -94,9 +94,25 @@ func build_all_layers(mask_contours: Dictionary) -> Dictionary:
 # ---------------------------------------------------------------------------
 
 ## Use Godot's built-in Geometry2D ear-clip triangulator.
-## Returns PackedInt32Array of triangle indices into the polygon.
+## Falls back to a fan from vertex 0 if ear-clip returns empty.
 func _triangulate_polygon(polygon: PackedVector2Array) -> PackedInt32Array:
-	return Geometry2D.triangulate_polygon(polygon)
+	var result: PackedInt32Array = Geometry2D.triangulate_polygon(polygon)
+	if result.size() >= 3:
+		return result
+
+	## Fallback: simple fan triangulation from vertex 0.
+	## Works for convex and mildly concave polygons.
+	if polygon.size() < 3:
+		return PackedInt32Array()
+
+	print("[layered] ear-clip failed for ", polygon.size(),
+		"-vertex polygon, using fan fallback")
+	var fan: PackedInt32Array = PackedInt32Array()
+	for i in range(1, polygon.size() - 1):
+		fan.append(0)
+		fan.append(i)
+		fan.append(i + 1)
+	return fan
 
 
 # ---------------------------------------------------------------------------

@@ -39,8 +39,20 @@ func build_water_surface(water_contours: Array[Dictionary]) -> ArrayMesh:
 			continue
 
 		var triangles: PackedInt32Array = Geometry2D.triangulate_polygon(verts_2d)
+		## Fallback: fan from vertex 0 if ear-clip fails.
 		if triangles.size() < 3:
-			continue
+			if verts_2d.size() >= 3:
+				print("[water_surface] ear-clip failed for ", verts_2d.size(),
+					"-vertex polygon, using fan fallback")
+				triangles = PackedInt32Array()
+				for fi in range(1, verts_2d.size() - 1):
+					triangles.append(0)
+					triangles.append(fi)
+					triangles.append(fi + 1)
+				if triangles.size() < 3:
+					continue
+			else:
+				continue
 
 		has_geometry = true
 

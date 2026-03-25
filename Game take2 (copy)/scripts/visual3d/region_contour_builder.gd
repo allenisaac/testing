@@ -47,7 +47,7 @@ func build_contours(mask: Array[float], field_data: Dictionary) -> Array[Diction
 	var segments: Array = _marching_squares(mask, grid_w, grid_h, iso, spacing, min_x, min_z)
 
 	## 2. Chain loose segments into closed polygon rings.
-	var rings: Array = _chain_segments(segments)
+	var rings: Array = _chain_segments(segments, spacing)
 
 	## 3. Simplify, measure area, filter.
 	var contours: Array[Dictionary] = []
@@ -174,11 +174,12 @@ func _lerp_edge(p0: Vector2, p1: Vector2, v0: float, v1: float, iso: float) -> V
 # ---------------------------------------------------------------------------
 
 ## Chain an unordered list of [Vector2, Vector2] segments into closed rings.
-## Uses a simple greedy weld with a small epsilon.
-func _chain_segments(segments: Array) -> Array:
+## Uses a greedy weld with epsilon scaled to the sample spacing.
+func _chain_segments(segments: Array, spacing: float) -> Array:
 	var rings: Array = []
 	var remaining: Array = segments.duplicate()
-	var weld_eps: float = 0.001
+	## Scale weld tolerance to the grid spacing so it works at any resolution.
+	var weld_eps: float = max(0.01, spacing * 0.01)
 
 	while not remaining.is_empty():
 		var chain: PackedVector2Array = PackedVector2Array()
@@ -210,6 +211,17 @@ func _chain_segments(segments: Array) -> Array:
 					chain.insert(0, s[1])
 					remaining.remove_at(i)
 					changed = true
+
+		## Strip duplicate closing vertex if the ring is closed.
+		if chain.size() >= 3 and chain[0].distance_to(chain[chain.size() - 1]) < weld_eps:
+			chain.remove_at(chain.size() - 1)
+
+		## Try to close open chains by connecting head to tail.
+		if chain.size() >= 3 and chain[0].distance_to(chain[chain.size() - 1]) > weld_eps:
+			## Chain didn't close — likely a boundary-touching region.
+			## Close it so triangulation can proceed.
+			print("[contours] closing open chain with ", chain.size(), " vertices (gap: ",
+				chain[0].distance_to(chain[chain.size() - 1]), ")")
 
 		rings.append(chain)
 

@@ -237,7 +237,10 @@ func _ensure_mesh_node(node_name: String) -> MeshInstance3D:
 
 ## Full layered-terrain generation pipeline.
 func build_layered_terrain() -> void:
-	print("=== Layered Terrain Pipeline ===")
+	print("")
+	print("========================================")
+	print("  LAYERED TERRAIN PIPELINE — START")
+	print("========================================")
 
 	## Hide old pipeline meshes when using layered path.
 	if generated_terrain != null:
@@ -246,14 +249,19 @@ func build_layered_terrain() -> void:
 		generated_water.mesh = null
 
 	## Step 1 — Region masks from the sample field.
-	print("[layered] building region masks")
+	var sample_count: int = field_data.get("samples", []).size()
+	var grid_w_pre: int = int(field_data.get("grid_width", 0))
+	var grid_h_pre: int = int(field_data.get("grid_height", 0))
+	print("")
+	print("[Step 1] Building region masks from field (%d samples, %dx%d grid)" % [
+		sample_count, grid_w_pre, grid_h_pre])
 	mask_data = region_mask_builder.build_all_masks(field_data)
 	var grid_w: int = int(mask_data.get("grid_width", 0))
 	var grid_h: int = int(mask_data.get("grid_height", 0))
-	print("[layered] mask grid: ", grid_w, " x ", grid_h)
 
 	## Step 2 — Extract contour polygons for each mask.
-	print("[layered] extracting contours")
+	print("")
+	print("[Step 2] Extracting contour polygons via marching squares")
 	var water_contours: Array[Dictionary] = region_contour_builder.build_contours(
 		mask_data.get("water", []), field_data
 	)
@@ -268,29 +276,42 @@ func build_layered_terrain() -> void:
 		"mud": mud_contours,
 		"grass": grass_contours,
 	}
-	print("[layered] contours — water: ", water_contours.size(),
-		", mud: ", mud_contours.size(),
-		", grass: ", grass_contours.size())
+	_log_contour_stats("water", water_contours)
+	_log_contour_stats("mud", mud_contours)
+	_log_contour_stats("grass", grass_contours)
 
 	## Step 3 — Build layered meshes.
-	print("[layered] building layer meshes")
+	print("")
+	print("[Step 3] Building flat layer meshes at configured Y heights")
 	var layer_meshes: Dictionary = layered_terrain_builder.build_all_layers(contour_data)
 
 	_apply_layer_mesh(generated_water_floor, layer_meshes.get("water_floor"),
 		_layer_color("layer_water_floor_color", Color(0.12, 0.18, 0.26, 1.0)))
+	_log_mesh_assignment("GeneratedWaterFloor", generated_water_floor)
+
 	_apply_layer_mesh(generated_mud, layer_meshes.get("mud"),
 		_layer_color("layer_mud_color", Color(0.38, 0.28, 0.16, 1.0)))
+	_log_mesh_assignment("GeneratedMud", generated_mud)
+
 	_apply_layer_mesh(generated_grass, layer_meshes.get("grass"),
 		_layer_color("layer_grass_color", Color(0.30, 0.52, 0.22, 1.0)))
+	_log_mesh_assignment("GeneratedGrass", generated_grass)
 
 	## Step 4 — Build water surface.
-	print("[layered] building water surface")
+	print("")
+	print("[Step 4] Building water surface mesh")
 	var water_surface_mesh: ArrayMesh = water_surface_builder.build_water_surface(water_contours)
 	if generated_water_surface != null:
 		generated_water_surface.mesh = water_surface_mesh
 		generated_water_surface.material_override = water_surface_builder.make_water_surface_material()
+	_log_mesh_assignment("GeneratedWaterSurface", generated_water_surface)
 
-	print("[layered] done — 4 layer meshes generated")
+	print("")
+	print("========================================")
+	print("  LAYERED TERRAIN PIPELINE — COMPLETE")
+	print("  Layers: water_floor, mud, grass, water_surface")
+	print("========================================")
+	print("")
 
 
 func _apply_layer_mesh(node: MeshInstance3D, mesh: ArrayMesh, color: Color) -> void:
@@ -308,6 +329,32 @@ func _layer_color(property_name: String, fallback: Color) -> Color:
 		return fallback
 	var val: Variant = config.get(property_name)
 	return val if val != null else fallback
+
+
+func _log_contour_stats(layer_name: String, contours: Array[Dictionary]) -> void:
+	var total_verts: int = 0
+	for c in contours:
+		var verts: PackedVector2Array = c.get("vertices", PackedVector2Array())
+		total_verts += verts.size()
+	print("  [contours] %s: %d region(s), %d total vertices" % [
+		layer_name, contours.size(), total_verts])
+
+
+func _log_mesh_assignment(node_name: String, node: MeshInstance3D) -> void:
+	if node == null:
+		print("  [mesh] %s: NODE MISSING" % node_name)
+		return
+	if node.mesh == null:
+		print("  [mesh] %s: no mesh assigned (empty layer)" % node_name)
+		return
+	var mesh: ArrayMesh = node.mesh as ArrayMesh
+	if mesh == null:
+		print("  [mesh] %s: mesh is not ArrayMesh" % node_name)
+		return
+	var surface_count: int = mesh.get_surface_count()
+	var has_material: bool = node.material_override != null
+	print("  [mesh] %s: %d surface(s), material=%s" % [
+		node_name, surface_count, "yes" if has_material else "NO"])
 
 
 # ===========================================================================

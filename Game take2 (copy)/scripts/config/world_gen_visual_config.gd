@@ -259,6 +259,7 @@ class_name WorldGenVisualConfig
 @export var mask_region_noise_frequency: float = 0.035 ## Noise frequency for organic mask edge wobble
 @export var mask_region_noise_strength: float = 0.18 ## How much noise shifts the mask threshold
 @export var mask_smoothing_passes: int = 2 ## Box-blur passes on the final binary mask for softer contours
+@export var mask_precedence_smooth_passes: int = 1 ## Extra smoothing passes after layer precedence subtraction
 @export var mask_require_inside_board: bool = true ## Discard mask samples outside the board footprint
 
 
