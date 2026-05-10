@@ -17,6 +17,7 @@ var mesh_builder := HexMeshBuilder.new()
 var _tile_shader : Shader
 var _grass_shader: Shader
 var _tile_side_shader: Shader
+var _grass_overhang_shader: Shader
 var tiles: Dictionary = {}
 
 # Registry mapping terrain_type string → handler instance.
@@ -28,6 +29,7 @@ func _ready() -> void:
 	_tile_shader  = load("res://shaders/tile_surface.gdshader") as Shader
 	_grass_shader = load("res://shaders/grass_billboard.gdshader") as Shader
 	_tile_side_shader = load("res://shaders/tile_side.gdshader") as Shader
+	_grass_overhang_shader = load("res://shaders/grass_overhang.gdshader") as Shader
 	_terrain_types["grass"] = grass_terrain if grass_terrain else TerrainGrass.new()
 	_clear_tiles()
 	_load_map_data()
@@ -134,6 +136,7 @@ func _make_shared_params() -> Dictionary:
 	return {
 		"tile_shader":      _tile_shader,
 		"grass_shader":     _grass_shader,
+		"grass_overhang_shader": _grass_overhang_shader,
 		"tile_side_shader": _tile_side_shader,
 	}
 

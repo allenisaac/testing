@@ -63,10 +63,11 @@ cast_shadow = 0
 mesh = SubResource("QuadMesh_rll1y")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewport" unique_id=1603884629]
-transform = Transform3D(0.70710677, 0.29883623, -0.6408563, 0, 0.90630776, 0.42261827, 0.70710677, -0.29883623, 0.6408563, 20, 3, 0)
+transform = Transform3D(0.70710677, 0.24184474, -0.664463, 0, 0.9396926, 0.34202012, 0.70710677, -0.24184474, 0.664463, 20, 3, 0)
+light_color = Color(0.9421533, 0.8429634, 0.7861748, 1)
 shadow_enabled = true
 script = ExtResource("3_dk0hk")
-light_angle_x = -25.0
+light_angle_x = -20.0
 light_angle_y = -45.0
 
 [node name="HexBoard3D" parent="SubViewport" unique_id=1446546224 instance=ExtResource("1_evviv")]
