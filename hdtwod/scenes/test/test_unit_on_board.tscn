@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://d21w6l5wwtf24"]
+
+[ext_resource type="PackedScene" uid="uid://kp7a2b8mwrqb" path="res://scenes/board/hex_board_3d.tscn" id="1_mbi5a"]
+[ext_resource type="PackedScene" uid="uid://cyfw1t4xnw6cu" path="res://scenes/units/unit_base.tscn" id="2_nny66"]
+
+[node name="TestUnitOnBoard" type="Node3D" unique_id=1795469167]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1627927683]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1129873097]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1496175225]
+
+[node name="HexBoard3D" parent="." unique_id=1446546224 instance=ExtResource("1_mbi5a")]
+
+[node name="UnitBase" parent="." unique_id=1257562077 instance=ExtResource("2_nny66")]

@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://kp7a2b8mwrqb"]
+
+[ext_resource type="Script" uid="uid://0j41mlybftkv" path="res://scripts/board/hex_board_3d.gd" id="1_ycvcm"]
+
+[node name="HexBoard3D" type="Node3D" unique_id=1446546224]
+script = ExtResource("1_ycvcm")
+
+[node name="Tiles" type="Node3D" parent="." unique_id=545458092]
+
+[node name="Props" type="Node3D" parent="." unique_id=427701165]
+
+[node name="Overlays" type="Node3D" parent="." unique_id=1123238186]
+
+[node name="Debug" type="Node3D" parent="." unique_id=863918622]

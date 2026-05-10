@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://dj6bqpswmlk0q"]
+
+[ext_resource type="PackedScene" uid="uid://kp7a2b8mwrqb" path="res://scenes/board/hex_board_3d.tscn" id="1_evviv"]
+[ext_resource type="Script" uid="uid://4mvutmlf2src" path="res://scripts/board/shader_globals.gd" id="1_w36jy"]
+[ext_resource type="Script" uid="uid://c0k1cjbabcw6p" path="res://scripts/board/directional_light_3d.gd" id="3_dk0hk"]
+[ext_resource type="Script" uid="uid://div4j03d0yvwv" path="res://scripts/board/terrain/terrain_grass.gd" id="4_ebgco"]
+[ext_resource type="Script" path="res://scripts/board/orbit_camera.gd" id="5_orbit"]
+
+[sub_resource type="Environment" id="Environment_evviv"]
+background_color = Color(0.045545302, 0.1347566, 0.114645325, 1)
+background_energy_multiplier = 1.3
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_rll1y"]
+viewport_path = NodePath("SubViewport")
+
+[sub_resource type="QuadMesh" id="QuadMesh_rll1y"]
+flip_faces = true
+size = Vector2(2, 2)
+
+[sub_resource type="Resource" id="Resource_w36jy"]
+script = ExtResource("4_ebgco")
+blade_height_change = null
+accent_height1 = null
+accent_height2 = null
+metadata/_custom_type_script = "uid://div4j03d0yvwv"
+
+[node name="PixelRoot" type="Node3D" unique_id=636400887]
+
+[node name="ShaderGlobals" type="Node" parent="." unique_id=1527228095]
+script = ExtResource("1_w36jy")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=215035835]
+environment = SubResource("Environment_evviv")
+
+[node name="Display" type="Control" parent="." unique_id=93394372]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 768.0
+offset_bottom = 432.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="ViewportTexture" type="Sprite2D" parent="Display" unique_id=901523307]
+position = Vector2(960, 540)
+scale = Vector2(3, 3)
+texture = SubResource("ViewportTexture_rll1y")
+
+[node name="SubViewport" type="SubViewport" parent="." unique_id=2048753163]
+size = Vector2i(640, 360)
+render_target_update_mode = 4
+
+[node name="Camera3D" type="Camera3D" parent="SubViewport" unique_id=246630770]
+projection = 1
+near = 0.001
+script = ExtResource("5_orbit")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SubViewport/Camera3D" unique_id=1740295087]
+cast_shadow = 0
+mesh = SubResource("QuadMesh_rll1y")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewport" unique_id=1603884629]
+transform = Transform3D(0.70710677, 0.29883623, -0.6408563, 0, 0.90630776, 0.42261827, 0.70710677, -0.29883623, 0.6408563, 20, 3, 0)
+shadow_enabled = true
+script = ExtResource("3_dk0hk")
+light_angle_x = -25.0
+light_angle_y = -45.0
+
+[node name="HexBoard3D" parent="SubViewport" unique_id=1446546224 instance=ExtResource("1_evviv")]
+grass_terrain = SubResource("Resource_w36jy")

@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://cyfw1t4xnw6cu"]
+
+[node name="UnitBase" type="Node3D" unique_id=1257562077]
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=955227025]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=226033213]
