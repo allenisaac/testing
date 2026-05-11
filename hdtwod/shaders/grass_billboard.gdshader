@@ -202,9 +202,9 @@ void vertex() {
 		VERTEX.y += accent_height2;
 		VERTEX *= accent_scale2;
 	} 
-    else {
+/*    else {
         VERTEX.y += blade_height_change;
-    }
+    }*/
 	// Get vertex world position
 	world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	// Find origin of each quad of grass in world-space

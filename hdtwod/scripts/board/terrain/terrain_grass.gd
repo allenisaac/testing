@@ -52,7 +52,7 @@ const _BLADE_SPACING: float = 0.2
 @export_group("Grass Overhangs")
 @export var overhang_texture: Texture2D = load("res://art/grass_overhang.png")
 @export var overhang_width: float = (HexCoord.RADIUS * 7.0)/5.0
-@export var overhang_depth: float = HexCoord.RADIUS * 0.48
+@export var overhang_depth: float = HexCoord.RADIUS * 0.36
 @export var overhang_edge_depth: float = HexCoord.RADIUS
 @export var overhang_y_lift: float = 0.01
 @export var overhang_alpha_scissor_threshold: float = 0.5
@@ -60,51 +60,22 @@ const _BLADE_SPACING: float = 0.2
 func get_tile_material(shared: Dictionary) -> ShaderMaterial:
 	var mat := ShaderMaterial.new()
 	mat.shader = shared["tile_shader"]
-	mat.set_shader_parameter("albedo1",           albedo1)
-	mat.set_shader_parameter("albedo2_hsl",       albedo2_hsl)
-	mat.set_shader_parameter("albedo2_noise",     albedo2_noise)
-	mat.set_shader_parameter("albedo2_scale",     albedo2_scale)
-	mat.set_shader_parameter("albedo2_threshold", albedo2_threshold)
-	mat.set_shader_parameter("albedo3_hsl",       albedo3_hsl)
-	mat.set_shader_parameter("albedo3_noise",     albedo3_noise)
-	mat.set_shader_parameter("albedo3_scale",     albedo3_scale)
-	mat.set_shader_parameter("albedo3_threshold", albedo3_threshold)
-	mat.set_shader_parameter("cuts",              cuts)
-	mat.set_shader_parameter("wrap",              wrap)
-	mat.set_shader_parameter("steepness",         steepness)
-	mat.set_shader_parameter("ambient_min",       ambient_min)
-	mat.set_shader_parameter("threshold_gradient_size", threshold_gradient_size)
-
-	var edge_mat := ShaderMaterial.new()
-	edge_mat.shader = load("res://shaders/edge_detection.gdshader") as Shader
-	mat.next_pass = edge_mat
+	RenderUtils.apply_common_surface_params(mat, self)
+	RenderUtils.attach_edge_detection_pass(mat)
 
 	return mat
-
 
 func get_side_material(shared: Dictionary) -> ShaderMaterial:
 	var mat := ShaderMaterial.new()
 	mat.shader = shared["tile_side_shader"]
-	mat.set_shader_parameter("albedo1",           albedo1)
-	mat.set_shader_parameter("albedo2_hsl",       albedo2_hsl)
-	mat.set_shader_parameter("albedo2_noise",     albedo2_noise)
-	mat.set_shader_parameter("albedo2_scale",     albedo2_scale)
-	mat.set_shader_parameter("albedo2_threshold", albedo2_threshold)
-	mat.set_shader_parameter("albedo3_hsl",       albedo3_hsl)
-	mat.set_shader_parameter("albedo3_noise",     albedo3_noise)
-	mat.set_shader_parameter("albedo3_scale",     albedo3_scale)
-	mat.set_shader_parameter("albedo3_threshold", albedo3_threshold)
-	mat.set_shader_parameter("cuts",              cuts)
-	mat.set_shader_parameter("wrap",              wrap)
-	mat.set_shader_parameter("steepness",         steepness)
-	mat.set_shader_parameter("ambient_min",       ambient_min)
-	mat.set_shader_parameter("threshold_gradient_size", threshold_gradient_size)
+	RenderUtils.apply_common_surface_params(mat, self)
+
 	if side_albedo != null:
 		mat.set_shader_parameter("side_albedo", side_albedo)
 	if side_normal != null:
 		mat.set_shader_parameter("side_normal", side_normal)
-	return mat
 
+	return mat
 
 func spawn_props(parent: Node3D, own_tiles: Dictionary, shared: Dictionary) -> void:
 	var blade_tex := albedo_texture
@@ -120,36 +91,32 @@ func spawn_props(parent: Node3D, own_tiles: Dictionary, shared: Dictionary) -> v
 
 	var grass_mat := ShaderMaterial.new()
 	grass_mat.shader = shared["grass_shader"]
-	grass_mat.set_shader_parameter("albedo_texture",          blade_tex)
-	grass_mat.set_shader_parameter("wind_noise",              blade_wind)
-	grass_mat.set_shader_parameter("blade_height_change",    blade_height_change)
-	grass_mat.set_shader_parameter("albedo1",                 albedo1)
-	grass_mat.set_shader_parameter("albedo2_hsl",             albedo2_hsl)
-	grass_mat.set_shader_parameter("albedo2_noise",           albedo2_noise)
-	grass_mat.set_shader_parameter("albedo2_scale",           albedo2_scale)
-	grass_mat.set_shader_parameter("albedo2_threshold",       albedo2_threshold)
-	grass_mat.set_shader_parameter("albedo3_hsl",             albedo3_hsl)
-	grass_mat.set_shader_parameter("albedo3_noise",           albedo3_noise)
-	grass_mat.set_shader_parameter("albedo3_scale",           albedo3_scale)
-	grass_mat.set_shader_parameter("albedo3_threshold",       albedo3_threshold)
-	grass_mat.set_shader_parameter("cuts",                    cuts)
-	grass_mat.set_shader_parameter("wrap",                    wrap)
-	grass_mat.set_shader_parameter("steepness",               steepness)
-	grass_mat.set_shader_parameter("threshold_gradient_size", threshold_gradient_size)
-	grass_mat.set_shader_parameter("accent_texture1",         accent_texture1 if accent_texture1 else load("res://art/accentleaf.png"))
-	grass_mat.set_shader_parameter("accent_albedo1",          accent_albedo1)
-	grass_mat.set_shader_parameter("accent_frequency1",       accent_frequency1)
-	grass_mat.set_shader_parameter("accent_height1",          accent_height1)
-	grass_mat.set_shader_parameter("accent_scale1",           accent_scale1)
-	grass_mat.set_shader_parameter("accent_texture2",         accent_texture2 if accent_texture2 else load("res://art/accentleaf.png"))
-	grass_mat.set_shader_parameter("accent_albedo2",          accent_albedo2)
-	grass_mat.set_shader_parameter("accent_probability2",     accent_probability2)
-	grass_mat.set_shader_parameter("accent_height2",          accent_height2)
-	grass_mat.set_shader_parameter("accent_scale2",           accent_scale2)
-	grass_mat.set_shader_parameter("ambient_min", ambient_min)
+	RenderUtils.apply_common_surface_params(grass_mat, self)
 
-	GrassSpawner.new().spawn_for_board(parent, own_tiles, _BLADE_SPACING, grass_mat, blade_width, blade_height)
+	grass_mat.set_shader_parameter("albedo_texture", blade_tex)
+	grass_mat.set_shader_parameter("wind_noise", blade_wind)
+	grass_mat.set_shader_parameter("blade_height_change", blade_height_change)
+	grass_mat.set_shader_parameter("accent_texture1", accent_texture1 if accent_texture1 else load("res://art/accentleaf.png"))
+	grass_mat.set_shader_parameter("accent_albedo1", accent_albedo1)
+	grass_mat.set_shader_parameter("accent_frequency1", accent_frequency1)
+	grass_mat.set_shader_parameter("accent_height1", accent_height1)
+	grass_mat.set_shader_parameter("accent_scale1", accent_scale1)
+	grass_mat.set_shader_parameter("accent_texture2", accent_texture2 if accent_texture2 else load("res://art/accentleaf.png"))
+	grass_mat.set_shader_parameter("accent_albedo2", accent_albedo2)
+	grass_mat.set_shader_parameter("accent_probability2", accent_probability2)
+	grass_mat.set_shader_parameter("accent_height2", accent_height2)
+	grass_mat.set_shader_parameter("accent_scale2", accent_scale2)
 
+	GrassSpawner.new().spawn_for_board(
+		parent,
+		own_tiles,
+		_BLADE_SPACING,
+		grass_mat,
+		blade_width,
+		blade_height,
+		int(shared.get("terrain_collision_mask", 1 << 1))
+	)
+	
 	var overhang_tex := overhang_texture
 	if overhang_tex == null:
 		overhang_tex = load("res://art/grass_overhang.png") as Texture2D
@@ -160,22 +127,11 @@ func spawn_props(parent: Node3D, own_tiles: Dictionary, shared: Dictionary) -> v
 
 	var overhang_mat := ShaderMaterial.new()
 	overhang_mat.shader = shared["grass_overhang_shader"]
+	RenderUtils.apply_common_surface_params(overhang_mat, self)
+
 	overhang_mat.set_shader_parameter("albedo_texture", overhang_tex)
-	overhang_mat.set_shader_parameter("albedo1", albedo1)
-	overhang_mat.set_shader_parameter("albedo2_hsl", albedo2_hsl)
-	overhang_mat.set_shader_parameter("albedo2_noise", albedo2_noise)
-	overhang_mat.set_shader_parameter("albedo2_scale", albedo2_scale)
-	overhang_mat.set_shader_parameter("albedo2_threshold", albedo2_threshold)
-	overhang_mat.set_shader_parameter("albedo3_hsl", albedo3_hsl)
-	overhang_mat.set_shader_parameter("albedo3_noise", albedo3_noise)
-	overhang_mat.set_shader_parameter("albedo3_scale", albedo3_scale)
-	overhang_mat.set_shader_parameter("albedo3_threshold", albedo3_threshold)
-	overhang_mat.set_shader_parameter("cuts", cuts)
-	overhang_mat.set_shader_parameter("wrap", wrap)
-	overhang_mat.set_shader_parameter("steepness", steepness)
-	overhang_mat.set_shader_parameter("ambient_min", ambient_min)
-	overhang_mat.set_shader_parameter("threshold_gradient_size", threshold_gradient_size)
 	overhang_mat.set_shader_parameter("alpha_scissor_threshold", overhang_alpha_scissor_threshold)
+	RenderUtils.attach_edge_detection_pass(overhang_mat)
 
 	OverhangSpawner.new().spawn_for_board(
 		parent,

@@ -165,4 +165,3 @@ void light() {
 
 	DIFFUSE_LIGHT = max(DIFFUSE_LIGHT, diffuse);
 }
-

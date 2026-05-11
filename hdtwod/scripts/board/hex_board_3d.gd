@@ -1,7 +1,10 @@
 class_name HexBoard3D
 extends Node3D
+const TERRAIN_PLACEMENT_LAYER: int = 2
+const TERRAIN_COLLISION_MASK: int = 1 << 1
 
 @export var map_file: String = "res://data/maps/test_map.json"
+
 @export var show_debug_directions: bool = false
 @export var debug_direction_tile: Vector2i = Vector2i(0, 0)
 @export var debug_marker_height: float = 2.5
@@ -9,34 +12,36 @@ extends Node3D
 
 @export_group("Terrain")
 @export var grass_terrain: TerrainGrass
-
 @export_group("")
+
 @onready var tiles_root: Node3D = $Tiles
 
 var mesh_builder := HexMeshBuilder.new()
-var _tile_shader : Shader
+
+var _tile_shader: Shader
 var _grass_shader: Shader
 var _tile_side_shader: Shader
 var _grass_overhang_shader: Shader
+
 var tiles: Dictionary = {}
 
 # Registry mapping terrain_type string → handler instance.
-# Add new terrain types here as they are created.
 var _terrain_types: Dictionary = {}
 
-
 func _ready() -> void:
-	_tile_shader  = load("res://shaders/tile_surface.gdshader") as Shader
+	_tile_shader = load("res://shaders/tile_surface.gdshader") as Shader
 	_grass_shader = load("res://shaders/grass_billboard.gdshader") as Shader
 	_tile_side_shader = load("res://shaders/tile_side.gdshader") as Shader
 	_grass_overhang_shader = load("res://shaders/grass_overhang.gdshader") as Shader
+
 	_terrain_types["grass"] = grass_terrain if grass_terrain else TerrainGrass.new()
+
 	_clear_tiles()
 	_load_map_data()
 	_spawn_board()
+
 	if show_debug_directions:
 		_spawn_debug_directions()
-
 
 func _load_map_data() -> void:
 	tiles.clear()
@@ -55,13 +60,11 @@ func _load_map_data() -> void:
 
 	var json := JSON.new()
 	var parse_result := json.parse(json_text)
-
 	if parse_result != OK:
 		push_error("Failed to parse JSON in map file: %s" % map_file)
 		return
 
 	var data = json.data
-
 	if not data.has("tiles"):
 		push_error("Map JSON missing 'tiles' array: %s" % map_file)
 		return
@@ -71,9 +74,9 @@ func _load_map_data() -> void:
 		var r: int = tile_entry["r"]
 		var elevation: int = tile_entry.get("elevation", 0)
 		var terrain_type: String = tile_entry.get("terrain_type", "grass")
+
 		var raw_ramp_edges: Array = tile_entry.get("ramp_edges", [false, false, false, false, false, false])
 		var ramp_edges: Array[bool] = []
-
 		for value in raw_ramp_edges:
 			ramp_edges.append(bool(value))
 
@@ -83,11 +86,10 @@ func _load_map_data() -> void:
 			"ramp_edges": ramp_edges,
 		}
 
-
 func _spawn_board() -> void:
 	var shared := _make_shared_params()
+	shared["terrain_placement_layer"] = TERRAIN_PLACEMENT_LAYER
 
-	# Group tiles by terrain_type so each handler can also batch its props.
 	var tiles_by_terrain: Dictionary = {}
 	for coord in tiles.keys():
 		var ttype: String = tiles[coord]["terrain_type"]
@@ -98,16 +100,18 @@ func _spawn_board() -> void:
 	for coord in tiles.keys():
 		var tile_data: Dictionary = tiles[coord]
 		var elevation: int = tile_data["elevation"]
-		var ramp_edges: Array[bool] = tile_data["ramp_edges"]
 		var terrain_type: String = tile_data["terrain_type"]
-
 		var handler: TerrainType = _terrain_types.get(terrain_type, _terrain_types["grass"])
+
+		var neighbor_elevations := BoardUtils.get_neighbor_elevations(tiles, coord)
+		var neighbor_presence := BoardUtils.get_neighbor_presence(tiles, coord)
+		var edge_types := BoardUtils.get_edge_types(tiles, coord)
 
 		var mesh := mesh_builder.build_tile_mesh(
 			elevation,
-			_get_neighbor_elevations(coord),
-			_get_neighbor_presence(coord),
-			ramp_edges
+			neighbor_elevations,
+			neighbor_presence,
+			edge_types
 		)
 
 		var mesh_instance := TileDebugInfo.new()
@@ -117,53 +121,36 @@ func _spawn_board() -> void:
 		mesh_instance.mesh = mesh
 		mesh_instance.position = HexCoord.axial_to_world(coord, HexCoord.RADIUS)
 		mesh_instance.set_surface_override_material(0, handler.get_tile_material(shared))
+
 		var side_mat := handler.get_side_material(shared)
 		if side_mat != null and mesh.get_surface_count() > 1:
 			mesh_instance.set_surface_override_material(1, side_mat)
 
 		tiles_root.add_child(mesh_instance)
+		var body := StaticBody3D.new()
+		body.name = "TileCollision_%s_%s" % [coord.x, coord.y]
+		body.collision_layer = TERRAIN_COLLISION_MASK
+		body.collision_mask = 0
+		body.position = mesh_instance.position
 
-	# Let each terrain handler spawn its own props (grass blades, rocks, etc.)
-	# passing only the tiles that belong to it.
+		var collision_shape := CollisionShape3D.new()
+		collision_shape.shape = mesh.create_trimesh_shape()
+		body.add_child(collision_shape)
+
+		tiles_root.add_child(body)
+
 	for ttype in tiles_by_terrain.keys():
 		var handler: TerrainType = _terrain_types.get(ttype, _terrain_types["grass"])
 		handler.spawn_props(tiles_root, tiles_by_terrain[ttype], shared)
 
-
-## Build the shared parameter dictionary passed to every terrain handler.
-## Terrain-specific params (colors, textures, lighting) live on the terrain resource itself.
 func _make_shared_params() -> Dictionary:
 	return {
-		"tile_shader":      _tile_shader,
-		"grass_shader":     _grass_shader,
+		"tile_shader": _tile_shader,
+		"grass_shader": _grass_shader,
 		"grass_overhang_shader": _grass_overhang_shader,
 		"tile_side_shader": _tile_side_shader,
+		"terrain_collision_mask": TERRAIN_COLLISION_MASK,
 	}
-
-
-func _get_neighbor_elevations(coord: Vector2i) -> Array[int]:
-	var result: Array[int] = []
-
-	for dir in range(6):
-		var neighbor_coord := HexCoord.get_neighbor(coord, dir)
-
-		if tiles.has(neighbor_coord):
-			result.append(tiles[neighbor_coord]["elevation"])
-		else:
-			result.append(0)
-
-	return result
-
-
-func _get_neighbor_presence(coord: Vector2i) -> Array[bool]:
-	var result: Array[bool] = []
-
-	for dir in range(6):
-		var neighbor_coord := HexCoord.get_neighbor(coord, dir)
-		result.append(tiles.has(neighbor_coord))
-
-	return result
-
 
 func _clear_tiles() -> void:
 	for child in tiles_root.get_children():
@@ -176,9 +163,6 @@ func _spawn_debug_directions() -> void:
 	var center_world := HexCoord.axial_to_world(debug_direction_tile, HexCoord.RADIUS)
 
 	for i in range(6):
-		# Place markers in the actual neighbor direction, not at hex corners.
-		# axial_to_world of the direction vector gives the world-space offset to
-		# the neighbour; normalize it and scale to the desired display radius.
 		var dir_world := HexCoord.axial_to_world(HexCoord.DIRECTION_VECTORS[i], HexCoord.RADIUS)
 		var dir_flat := Vector2(dir_world.x, dir_world.z).normalized()
 		var local_pos := Vector3(dir_flat.x, 0.0, dir_flat.y) * HexCoord.RADIUS * 0.75
@@ -193,7 +177,6 @@ func _spawn_debug_directions() -> void:
 		mat.albedo_color = _debug_direction_color(i)
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		marker.material_override = mat
-
 		marker.name = "DebugDir_%d" % i
 		$Debug.add_child(marker)
 
@@ -213,7 +196,6 @@ func _debug_direction_name(i: int) -> String:
 		4: return "4 SW"
 		5: return "5 SE"
 		_: return str(i)
-
 
 func _debug_direction_color(i: int) -> Color:
 	match i:

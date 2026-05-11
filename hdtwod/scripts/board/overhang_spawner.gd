@@ -31,7 +31,8 @@ func spawn_for_board(
 
 		for edge_i in range(6):
 			var dir: int = EDGE_TO_DIR[edge_i]
-			if not _is_cliff_edge(tiles, coord, dir, tile_elevation):
+			var edge_type := BoardUtils.get_edge_type(tiles, coord, dir)
+			if edge_type != BoardUtils.EdgeType.CLIFF:
 				continue
 
 			var next_i: int = (edge_i + 1) % 6
@@ -73,6 +74,10 @@ func spawn_for_board(
 	mmi.material_override = material
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	parent.add_child(mmi)
+
+
+
+
 
 func _is_cliff_edge(
 	tiles: Dictionary,
