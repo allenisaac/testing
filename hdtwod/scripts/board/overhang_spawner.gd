@@ -27,13 +27,18 @@ func spawn_for_board(
 		var tile_world: Vector3 = HexCoord.axial_to_world(coord, HexCoord.RADIUS)
 		var top_y: float = HexCoord.elevation_to_height(tile_elevation) + y_lift
 
+
 		var corners: Array[Vector3] = HexCoord.get_corner_positions(HexCoord.RADIUS)
 
 		for edge_i in range(6):
+			var overhang_y: float = top_y
+
 			var dir: int = EDGE_TO_DIR[edge_i]
 			var edge_type := BoardUtils.get_edge_type(tiles, coord, dir)
 			if edge_type != BoardUtils.EdgeType.CLIFF:
 				continue
+			if BoardUtils.is_ramp_edge(tile_data, dir):
+				overhang_y = top_y - HexCoord.ELEVATION_STEP
 
 			var next_i: int = (edge_i + 1) % 6
 			var outer_a: Vector3 = corners[edge_i]
@@ -47,7 +52,7 @@ func spawn_for_board(
 			var outward_portion: float = quad_depth - edge_depth
 			var center_shift: float = (outward_portion - inward_portion) * 0.5
 
-			var origin: Vector3 = tile_world + Vector3(edge_mid.x, top_y, edge_mid.z)
+			var origin: Vector3 = tile_world + Vector3(edge_mid.x, overhang_y, edge_mid.z)
 			positions.append(origin)
 			y_rotations.append(yaw)
 
@@ -75,19 +80,3 @@ func spawn_for_board(
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	parent.add_child(mmi)
 
-
-
-
-
-func _is_cliff_edge(
-	tiles: Dictionary,
-	coord: Vector2i,
-	dir: int,
-	tile_elevation: int
-) -> bool:
-	var neighbor_coord := HexCoord.get_neighbor(coord, dir)
-	if not tiles.has(neighbor_coord):
-		return true
-
-	var neighbor_elevation: int = tiles[neighbor_coord].get("elevation", 0)
-	return neighbor_elevation < tile_elevation

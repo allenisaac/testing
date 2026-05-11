@@ -1,7 +1,7 @@
 class_name RenderUtils
 extends RefCounted
 
-static func apply_common_surface_params(mat: ShaderMaterial, terrain: TerrainGrass) -> void:
+static func apply_common_surface_params(mat: ShaderMaterial, terrain: TerrainType) -> void:
 	mat.set_shader_parameter("albedo1", terrain.albedo1)
 	mat.set_shader_parameter("albedo2_hsl", terrain.albedo2_hsl)
 	mat.set_shader_parameter("albedo2_noise", terrain.albedo2_noise)

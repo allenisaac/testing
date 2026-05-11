@@ -12,6 +12,7 @@ const TERRAIN_COLLISION_MASK: int = 1 << 1
 
 @export_group("Terrain")
 @export var grass_terrain: TerrainGrass
+@export var dirt_terrain: TerrainDirt
 @export_group("")
 
 @onready var tiles_root: Node3D = $Tiles
@@ -35,7 +36,7 @@ func _ready() -> void:
 	_grass_overhang_shader = load("res://shaders/grass_overhang.gdshader") as Shader
 
 	_terrain_types["grass"] = grass_terrain if grass_terrain else TerrainGrass.new()
-
+	_terrain_types["dirt"] = dirt_terrain if dirt_terrain else TerrainDirt.new()
 	_clear_tiles()
 	_load_map_data()
 	_spawn_board()
@@ -111,7 +112,8 @@ func _spawn_board() -> void:
 			elevation,
 			neighbor_elevations,
 			neighbor_presence,
-			edge_types
+			edge_types,
+			handler.get_height_offset()
 		)
 
 		var mesh_instance := TileDebugInfo.new()

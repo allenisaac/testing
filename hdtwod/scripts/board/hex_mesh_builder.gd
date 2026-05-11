@@ -9,7 +9,8 @@ func build_tile_mesh(
 	tile_elevation: int,
 	neighbor_elevations: Array[int],
 	neighbor_presence: Array[bool],
-	edge_types: Array[int]
+	edge_types: Array[int],
+	height_offset: float = 0.0
 ) -> ArrayMesh:
 	_has_side = false
 
@@ -19,7 +20,7 @@ func build_tile_mesh(
 	var st_side := SurfaceTool.new()
 	st_side.begin(Mesh.PRIMITIVE_TRIANGLES)
 
-	var top_y := HexCoord.elevation_to_height(tile_elevation)
+	var top_y := HexCoord.elevation_to_height(tile_elevation) + height_offset
 	var outer := HexCoord.get_corner_positions(HexCoord.RADIUS)
 	var inner := HexCoord.get_corner_positions(HexCoord.TOP_INSET)
 
