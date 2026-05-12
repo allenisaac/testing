@@ -1,6 +1,6 @@
 # hdtwod — Hex Tactics 2.5D
 
-Godot 4 isometric tactics game prototype. Hex grid, flat-shaded pixel-art look rendered through a SubViewport, with billboard grass and fullscreen edge detection.
+Godot 4 hex tactics game prototype. Hex grid, toon-shaded pixel-art look rendered through a SubViewport, with billboard grass, cliff overhangs, and screen-space edge detection.
 
 ---
 
@@ -9,14 +9,21 @@ Godot 4 isometric tactics game prototype. Hex grid, flat-shaded pixel-art look r
 ```
 data/maps/          JSON map files
 scripts/
-  board/            HexBoard3D, HexMeshBuilder, GrassSpawner
+  board/            HexBoard3D, HexMeshBuilder, GrassSpawner, OverhangSpawner
+  board/terrain/    TerrainType base class and per-terrain handlers (grass, dirt)
   grid/             HexCoord (pure hex math — no Godot nodes)
+  utilities/        BoardUtils (edge/neighbor queries), RenderUtils (material helpers)
   mesh/             (reserved for future mesh utilities)
   core/             (reserved for game logic)
 shaders/
-  tile_surface.gdshader    Hex tile surface material
+  tile_surface.gdshader    Hex tile top-face material
+  tile_side.gdshader       Cliff wall (side) surface material
   grass_billboard.gdshader Billboard grass blades
-  edge_detection.gdshader  Fullscreen post-process outlines
+  grass_overhang.gdshader  Grass overhang quads at cliff edges
+  edge_detection.gdshader  Screen-space outline post-process
+  includes/
+    hsl_utils.gdshaderinc       HSL ↔ RGB helpers
+    toon_light_utils.gdshaderinc Toon light step function
 scenes/
   board/            Reusable board scene (hex_board_3d.tscn)
   test/             Test scenes — start here
@@ -27,29 +34,33 @@ art/                Textures (.png, .tres noise resources)
 
 ## Rendering Pipeline
 
-Everything renders inside a **SubViewport** at a fixed pixel resolution (640×360). A `CanvasLayer / TextureRect` blits it to the screen with nearest-neighbour filtering to get the pixel-art look.
+Everything renders inside a **SubViewport** at a fixed pixel resolution (640×360). A `Control / Sprite2D` node samples the SubViewport as a `ViewportTexture` and scales it up to fill the screen, producing the pixel-art look.
 
 ```
-SubViewport (640×360)
-  ├─ Camera3D
-  │    └─ MeshInstance3D  ← QuadMesh (2×2, flip_faces=true)
-  │                          ShaderMaterial → edge_detection.gdshader
-  │                          (fullscreen post-process, child of camera so it
-  │                           always covers the screen in clip space)
+PixelRoot (Node3D)
+  ├─ ShaderGlobals           ← sets global shader params (cloud, etc.)
   ├─ WorldEnvironment
-  ├─ DirectionalLight3D   ← present but NOT used by tile/grass shaders
-  └─ HexBoard3D
-       └─ Tiles/
-            ├─ Tile_0_0   MeshInstance3D  → tile_surface.gdshader
-            ├─ Tile_1_0   ...
-            └─ Grass       MultiMeshInstance3D → grass_billboard.gdshader
+  ├─ Display (Control)
+  │    └─ ViewportTexture (Sprite2D) ← samples SubViewport, scaled 3×
+  └─ SubViewport (640×360)
+       ├─ Camera3D            ← orthographic, script: OrbitCamera
+       │    └─ MeshInstance3D ← QuadMesh (2×2, flip_faces=true), no material
+       ├─ DirectionalLight3D  ← drives toon shading via Godot light pass
+       └─ HexBoard3D
+            └─ Tiles/
+                 ├─ Tile_0_0   MeshInstance3D (surface 0 → tile_surface, surface 1 → tile_side)
+                 ├─ TileCollision_0_0  StaticBody3D (trimesh collision)
+                 ├─ ...
+                 └─ GrassTiles  MultiMeshInstance3D → grass_billboard.gdshader
 ```
 
-### Why unshaded?
+### Toon lighting
 
-Tile and grass shaders use `render_mode unshaded`. This bypasses Godot's lighting pass entirely. Shading is computed manually so it is **deterministic and camera-independent** — essential for pixel art where indirect or specular lighting would break the flat look.
+Tile and grass shaders use Godot's standard light pass (`void light()`) rather than `render_mode unshaded`. The `DirectionalLight3D` drives the toon shading. The step function in `toon_light_utils.gdshaderinc` quantises `NdotL` into `cuts` discrete bands, controlled per-terrain by `cuts`, `wrap`, `steepness`, and `ambient_min`.
 
-The `DirectionalLight3D` in the scene is kept for environment ambient (fog, sky) but does not affect tile or grass colour.
+### Edge detection
+
+Screen-space outlines are applied as a **`next_pass`** material chained onto each tile surface material. `RenderUtils.attach_edge_detection_pass(mat)` creates an `edge_detection.gdshader` material and assigns it to `mat.next_pass`. The effect samples depth and normal buffers to draw outline and shadow halos around geometry.
 
 ---
 
@@ -57,31 +68,27 @@ The `DirectionalLight3D` in the scene is kept for environment ambient (fog, sky)
 
 ### `tile_surface.gdshader`
 
-Renders each hex tile mesh.
+Renders the top face of each hex tile.
 
-**Technique: manual toon shading**
+**Color zones:** three layers evaluated at `world_pos.xz` (world-space):
 
-```glsl
-NdotL = dot(normalize(world_normal), normalize(sun_direction))
-shade = mix(ambient_min, 1.0, floor(NdotL * shade_cuts) / shade_cuts)
-ALBEDO = zone_color * shade
-```
-
-`world_normal` is computed in `vertex()` from `MODEL_MATRIX * NORMAL` so flat normals (set explicitly by `HexMeshBuilder`) survive correctly. The top face is brightest, side cliffs are darker — all controlled by `sun_direction`.
-
-**Technique: Dylearn-style color zones**
-
-Three layers evaluated at `world_pos.xz` (world-space, not UV-space):
-
-| Layer | When active |
+| Uniform | Role |
 |---|---|
-| `color_base` | Always (fallback) |
-| `color2` | `noise2.r > color2_threshold` |
-| `color3` | `noise3.r > color3_threshold` |
+| `albedo1` | Base color (always used) |
+| `albedo2_hsl` | HSL delta (ΔHue°, ΔSat, ΔLight) relative to `albedo1` |
+| `albedo2_noise` / `albedo2_scale` / `albedo2_threshold` | Noise mask for zone 2 |
+| `albedo3_hsl` | HSL delta relative to `albedo1` for zone 3 |
+| `albedo3_noise` / `albedo3_scale` / `albedo3_threshold` | Noise mask for zone 3 |
 
-Layers 2 and 3 are hard-threshold overrides (not blends). Setting a high threshold (e.g. 0.85) for zone 3 gives sparse accent patches.
+`albedo2` and `albedo3` colors are computed at runtime by shifting `albedo1` through HSL space, so changing `albedo1` alone produces a coherent palette for a terrain type. Zones are hard-threshold overrides (not blends).
 
-**Edge detection opt-in:** writes `ROUGHNESS = 1.0` so the roughness GBuffer alpha is non-zero → `ceil(roughness)` mask in the edge shader includes this surface.
+**Toon lighting** runs in `void light()` and reads per-material uniforms: `cuts`, `wrap`, `steepness`, `ambient_min`.
+
+---
+
+### `tile_side.gdshader`
+
+Renders the cliff wall surfaces (mesh surface 1) generated by `HexMeshBuilder` when a tile is higher than its neighbour. Shares the same color-zone and toon-lighting uniforms as `tile_surface.gdshader`, plus `side_albedo` (texture) and `side_normal` (normal map) for the cliff face.
 
 ---
 
@@ -106,61 +113,34 @@ MODELVIEW_MATRIX = VIEW_MATRIX * mat4(
 NdotL_top = max(normalize(sun_direction).y, 0.0)
 ```
 
-This is equivalent to `dot(UP, sun_direction)` — exactly the shade the tile's top face gets. Blades always match the surface beneath them.
+**Wind:** samples a `wind_noise` texture animated by `TIME`. Applies a lean to the upper half of the quad only (lower half stays anchored).
 
-**Wind:** samples a `wind_noise` texture animated by `TIME * wind_speed`. Applies a `rotate_axis()` tilt of up to `wind_strength` degrees from vertical, only to the upper half of the quad (lower half stays anchored).
+**Accent blades:** supports two accent layers (`accent_texture1`, `accent_texture2`) with independent albedo, scale, frequency, and height settings for visual variety within the same `MultiMesh`.
 
-**Edge detection opt-out:** writes `ROUGHNESS = 0.0` so the roughness alpha is 0 → `ceil(0) = 0` → excluded from edge detection mask. No outlines on grass blades.
+**Edge detection opt-out:** no roughness write, so grass blades are excluded from outlines.
 
 ---
 
 ### `edge_detection.gdshader`
 
-Fullscreen post-process applied by a camera-child QuadMesh.
-
-**Setup requirements:**
-- QuadMesh: size `(2, 2)`, `flip_faces = true`
-- Parent: `Camera3D` (not a sibling in the scene)
-- `vertex()` overrides `POSITION = vec4(VERTEX.xy, 1.0, 1.0)` to pin the quad to clip space regardless of camera movement
-- `render_mode specular_disabled, ambient_light_disabled` — the `light()` function returns `DIFFUSE_LIGHT = vec3(1.0)` so ALBEDO passes through unmodified
-
-**Edge detection mask (which surfaces get outlines):**
-
-```glsl
-float mask = ceil(texture(NORMAL_TEXTURE, uv).a);  // a = roughness
-```
-
-- `roughness = 1.0` in tile shader → included (mask = 1)
-- `roughness = 0.0` in grass shader → excluded (mask = 0)
-- To exclude any future surface from outlines: set `ROUGHNESS = 0.0` in its fragment shader
+Screen-space outline post-process. Applied as a **`next_pass`** material on tile surface and overhang materials via `RenderUtils.attach_edge_detection_pass(mat)`. The effect reads depth and normal-roughness buffers to draw outline halos.
 
 **Two edge signals:**
 
-1. **Depth edges** — accumulates `clamp(neighbor_depth - center_depth, 0, 1)` over 4 neighbours. Detects silhouettes and depth discontinuities (cliff edges, tile height steps).
+1. **Depth edges** — accumulates `clamp(neighbor_depth − center_depth, 0, 1)` over 4 neighbours. Detects silhouettes and height discontinuities.
 
-2. **Normal edges** — uses `NormalEdgeIndicator` (Kody King / Three.js): detects surface normal discontinuities between adjacent pixels (top face vs. cliff face boundary).
+2. **Normal edges** — `NormalEdgeIndicator` (inspired by Three.js / Kody King): detects normal discontinuities between adjacent pixels (e.g. top face vs. cliff face).
 
-**Tuning uniforms (Inspector on the MeshInstance3D):**
+**Tuning uniforms:**
 
-| Uniform | Effect | Default |
-|---|---|---|
-| `enabled` | Toggle all outlines | `true` |
-| `depth_threshold` | How large a depth jump triggers an edge | `0.25` |
-| `normal_threshold` | How large a normal difference triggers an edge | `0.2` |
-| `line_alpha` | Edge opacity | `0.85` |
-| `line_highlight` | Brightness added on bright edges | `0.35` |
-| `line_shadow` | Darkness multiplier on dark edges | `0.65` |
-| `debug_view` | See below | `0` |
-
-**Debug views** (`debug_view` uniform):
-
-| Value | Shows |
+| Uniform | Effect |
 |---|---|
-| `0` | Normal output |
-| `1` | Linear depth as gray (tiles = varying grays, sky = black) |
-| `2` | Geometry mask (white = will get outlines, black = sky or excluded) |
-| `3` | Depth edge signal only |
-| `4` | Normal edge signal only |
+| `shadows_enabled` | Toggle dark edge halos |
+| `highlights_enabled` | Toggle bright edge halos |
+| `shadow_strength` | Opacity of shadow outlines |
+| `highlight_strength` | Opacity of highlight outlines |
+| `shadow_color` | Color of dark edge (default black) |
+| `highlight_color` | Color of bright edge (default white) |
 
 ---
 
@@ -204,7 +184,7 @@ Corner heights are resolved so dual-ramp corners don't spike upward.
 
 ### `HexBoard3D` (`scripts/board/hex_board_3d.gd`)
 
-Scene root for the board. Loads a JSON map, spawns tile meshes, then spawns grass.
+Scene root for the board. Loads a JSON map, spawns tile meshes and collision bodies, then delegates prop spawning (grass, overhangs) to terrain handlers.
 
 **Map format** (`data/maps/*.json`):
 
@@ -214,57 +194,61 @@ Scene root for the board. Loads a JSON map, spawns tile meshes, then spawns gras
     {
       "q": 0,  "r": 0,
       "elevation": 2,
+      "terrain_type": "grass",
       "ramp_edges": [true, true, false, false, true, false]
     }
   ]
 }
 ```
 
-`ramp_edges` is a 6-element bool array indexed by direction (0=E … 5=SE).
+`ramp_edges` is a 6-element bool array indexed by direction (0=E … 5=SE). `terrain_type` defaults to `"grass"` if absent.
 
-**Inspector groups:**
+**Inspector exports:**
 
-*Tile Appearance* — `color_base`, `color2_*`, `color3_*`, `sun_direction`, `ambient_min`, `shade_cuts`
+- `grass_terrain: TerrainGrass` — assign a `TerrainGrass` resource; falls back to `TerrainGrass.new()` if unassigned
+- `dirt_terrain: TerrainDirt` — same for dirt tiles
+- `map_file` — path to the JSON map
+- `show_debug_directions` / `debug_direction_tile` — optional direction markers
 
-*Grass* — `grass_blade_texture`, `grass_wind_noise`, `grass_blade_spacing`
-
-The grass and tile shaders share identical color zone + lighting uniforms. `HexBoard3D._make_grass_material()` copies them all from the board's own exports, so changing one export updates both.
+**Tile collision:** each tile gets a `StaticBody3D` (on `TERRAIN_COLLISION_MASK = layer 2`) with a trimesh `CollisionShape3D`. `GrassSpawner` uses raycasts against this mask to land blades on the correct surface height.
 
 ---
 
 ### `GrassSpawner` (`scripts/board/grass_spawner.gd`)
 
-Spawns all grass for the board as a **single** `MultiMeshInstance3D` named `"Grass"` under the tiles root.
+Spawns all grass for a terrain type as a **single** `MultiMeshInstance3D` under the tiles root.
 
 **Algorithm:**
-1. Compute world bounding box of all tile centers, expand by `RADIUS × 1.5`
-2. Walk a regular grid at `blade_spacing` intervals across the box
-3. For each cell, apply a deterministic hash-jitter (`_hash2`) to the XZ position
-4. Convert jittered XZ to axial hex coord (`_world_to_hex`, pointy-top inverse + cube rounding)
-5. Accept the blade only if that hex coord is in the `tiles` dictionary
-6. Build one `MultiMesh`, set each instance transform with the blade's world position and a random Y-rotation
-
-`blade_spacing = 0.25` ≈ 16 blades per tile. Halving the spacing quadruples blade count.
-
-**Adding coverage to non-grass tile types in future:** `tiles[coord]` currently only stores elevation and ramp_edges. To filter by type (e.g. no grass on stone), add a `"type"` field to the JSON and check it in the acceptance condition.
+1. Compute world bounding box of spawn tiles, expand by `RADIUS × 1.5`
+2. Walk a regular grid at `blade_spacing` (0.2) intervals across the box
+3. Apply deterministic hash-jitter (`_hash2`) to each candidate XZ position
+4. Convert jittered XZ to axial hex coord (`_world_to_hex`); skip if hex not in spawn set
+5. **Raycast** downward to find the actual surface Y (`BoardUtils.sample_surface_position`)
+6. Place a blade at the hit position with a random Y-rotation
 
 ---
 
-## Adding a New Tile Type
+### `OverhangSpawner` (`scripts/board/overhang_spawner.gd`)
 
-1. Add a `"type"` key to tile entries in the JSON (e.g. `"type": "stone"`)
-2. Parse it in `HexBoard3D._load_map_data()` and store in the `tiles` dict
-3. Create a new `ShaderMaterial` in `_spawn_board()` that uses a different shader or different color uniforms based on type
-4. If the tile should have no grass, check `tile_data["type"] != "grass"` in `GrassSpawner.spawn_for_board()` (pass the type through the dict; it's already available)
-5. If the tile should have no outlines, set `ROUGHNESS = 0.0` in its shader
+Spawns grass overhang quads along cliff edges as a single `MultiMeshInstance3D`. For each cliff edge of each grass tile it places a quad at the edge midpoint, oriented outward, at the tile's top Y. The `grass_overhang.gdshader` handles alpha-scissor transparency and toon shading.
+
+---
+
+## Adding a New Terrain Type
+
+See [scripts/board/terrain/README.md](scripts/board/terrain/README.md) for the full guide.
+
+Brief overview:
+1. Create `scripts/board/terrain/terrain_<name>.gd` extending `TerrainType` (a `Resource`)
+2. Add `@export var <name>_terrain: Terrain<Name>` to `HexBoard3D` and register it in `_terrain_types`
+3. Use `"terrain_type": "<name>"` in map JSON tiles
 
 ---
 
 ## Adding a New Billboard Object (unit, prop, etc.)
 
-1. Use `render_mode unshaded` (or `render_mode depth_prepass_alpha, depth_draw_opaque` for alpha)
-2. Override `MODELVIEW_MATRIX` the same way as the grass shader to billboard toward camera
-3. Set `ROUGHNESS = 0.0` to **exclude** from edge detection outlines, or `ROUGHNESS = 1.0` to **include**
+1. Override `MODELVIEW_MATRIX` the same way as the grass shader to billboard toward camera
+2. Apply `RenderUtils.attach_edge_detection_pass(mat)` to include the surface in outlines
 
 ---
 
@@ -273,9 +257,7 @@ Spawns all grass for the board as a **single** `MultiMeshInstance3D` named `"Gra
 | Problem | Cause | Fix |
 |---|---|---|
 | Shader compiles but tiles go white | `hint_range` annotation on a `vec3` uniform silently fails to compile | Never add `hint_range` to vec3/vec4 uniforms |
-| Edge detection shows nothing | QuadMesh missing `flip_faces = true`, or shader has duplicate `shader_type` declaration | Ensure flip_faces=true; write shader files with Python (heredoc strips tabs) |
 | `return` in spatial `fragment()` crashes | Godot 4 does not support early return in spatial fragment | Use `if/else` to branch instead |
 | GDScript "Variant inference" error | `roundi()` and `abs()` return Variant — `:=` inference fails | Add explicit type annotation: `var q: int = roundi(...)` |
-| Writing .gd files from terminal | Bash heredoc strips tab indentation | Use `python3` with `\t` escapes to write the file |
 | Scene baked ShaderMaterial params override shader defaults | Godot serializes `shader_parameter/x` in .tscn; changing shader default has no effect | Edit the `shader_parameter/` values in the .tscn directly |
-| Grass not receiving outlines (intentional) | `ROUGHNESS = 0.0` → roughness GBuffer alpha = 0 → mask = 0 | This is correct; see edge detection mask section |
+| Grass blades float above surface | Raycasts miss if `StaticBody3D` collision layer doesn't match `TERRAIN_COLLISION_MASK` | Ensure tile bodies are on layer 2 (`1 << 1`) |

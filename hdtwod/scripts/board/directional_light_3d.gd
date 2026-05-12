@@ -5,12 +5,12 @@ extends DirectionalLight3D
 @onready var directional_light: DirectionalLight3D = $"."
 
 
-@export var light_angle_x: float = -5.0:
+@export var light_angle_x: float = -15.0:
 	set(v):
 		light_angle_x = v
 		_update_light_rotation()
 
-@export var light_angle_y: float = -30.0:
+@export var light_angle_y: float = -50.0:
 	set(v):
 		light_angle_y = v
 		_update_light_rotation()

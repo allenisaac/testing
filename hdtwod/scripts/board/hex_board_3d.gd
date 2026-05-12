@@ -13,6 +13,14 @@ const TERRAIN_COLLISION_MASK: int = 1 << 1
 @export_group("Terrain")
 @export var grass_terrain: TerrainGrass
 @export var dirt_terrain: TerrainDirt
+@export var water_terrain: TerrainWater
+@export_group("Features")
+## BoardwalkBuilder resource — runs automatically; falls back to BoardwalkBuilder.new()
+## if not assigned, so existing scenes work without inspector changes.
+@export var boardwalk_builder: BoardwalkBuilder
+## Additional tile feature handlers (tree, rock, ruins, etc.).
+## Each is a TileFeature resource called after terrain and boardwalk passes.
+@export var tile_features: Array[TileFeature] = []
 @export_group("")
 
 @onready var tiles_root: Node3D = $Tiles
@@ -23,6 +31,7 @@ var _tile_shader: Shader
 var _grass_shader: Shader
 var _tile_side_shader: Shader
 var _grass_overhang_shader: Shader
+var _water_shader: Shader
 
 var tiles: Dictionary = {}
 
@@ -34,9 +43,11 @@ func _ready() -> void:
 	_grass_shader = load("res://shaders/grass_billboard.gdshader") as Shader
 	_tile_side_shader = load("res://shaders/tile_side.gdshader") as Shader
 	_grass_overhang_shader = load("res://shaders/grass_overhang.gdshader") as Shader
+	_water_shader = load("res://shaders/water_surface.gdshader") as Shader
 
 	_terrain_types["grass"] = grass_terrain if grass_terrain else TerrainGrass.new()
 	_terrain_types["dirt"] = dirt_terrain if dirt_terrain else TerrainDirt.new()
+	_terrain_types["water"] = water_terrain if water_terrain else TerrainWater.new()
 	_clear_tiles()
 	_load_map_data()
 	_spawn_board()
@@ -65,7 +76,7 @@ func _load_map_data() -> void:
 		push_error("Failed to parse JSON in map file: %s" % map_file)
 		return
 
-	var data = json.data
+	var data: Variant = json.data
 	if not data.has("tiles"):
 		push_error("Map JSON missing 'tiles' array: %s" % map_file)
 		return
@@ -81,15 +92,38 @@ func _load_map_data() -> void:
 		for value in raw_ramp_edges:
 			ramp_edges.append(bool(value))
 
+		# tile_feature — nullable string for a whole-tile structural/gameplay feature
+		# (e.g. "tree", "rock", "ruins"). Distinct from edge_features which encode
+		# directional connectivity.
+		var tile_feature: Variant = tile_entry.get("tile_feature", null)
+
+		# game_object — nullable string tag for special per-tile objects.
+		var game_object: Variant = tile_entry.get("game_object", null)
+
+		# edge_features — 6-element array; each slot is null or a string like
+		# "boardwalk". Missing or short arrays are padded to length 6 with nulls.
+		var raw_edge_features: Array = tile_entry.get("edge_features", [])
+		var edge_features: Array = []
+		for i in range(6):
+			if i < raw_edge_features.size():
+				edge_features.append(raw_edge_features[i])
+			else:
+				edge_features.append(null)
+
 		tiles[Vector2i(q, r)] = {
 			"elevation": elevation,
 			"terrain_type": terrain_type,
 			"ramp_edges": ramp_edges,
+			"tile_feature": tile_feature,
+			"game_object": game_object,
+			"edge_features": edge_features,
 		}
 
 func _spawn_board() -> void:
 	var shared := _make_shared_params()
 	shared["terrain_placement_layer"] = TERRAIN_PLACEMENT_LAYER
+	# Full tiles dict — feature handlers need this for neighbour lookups.
+	shared["tiles"] = tiles
 
 	var tiles_by_terrain: Dictionary = {}
 	for coord in tiles.keys():
@@ -104,17 +138,29 @@ func _spawn_board() -> void:
 		var terrain_type: String = tile_data["terrain_type"]
 		var handler: TerrainType = _terrain_types.get(terrain_type, _terrain_types["grass"])
 
-		var neighbor_elevations := BoardUtils.get_neighbor_elevations(tiles, coord)
-		var neighbor_presence := BoardUtils.get_neighbor_presence(tiles, coord)
-		var edge_types := BoardUtils.get_edge_types(tiles, coord)
-
-		var mesh := mesh_builder.build_tile_mesh(
-			elevation,
-			neighbor_elevations,
-			neighbor_presence,
-			edge_types,
-			handler.get_height_offset()
-		)
+		var mesh: ArrayMesh
+		var custom_mesh := handler.build_custom_tile_mesh(tiles, coord, shared)
+		if custom_mesh != null:
+			mesh = custom_mesh
+		else:
+			var neighbor_elevations := BoardUtils.get_neighbor_elevations(tiles, coord)
+			var neighbor_presence := BoardUtils.get_neighbor_presence(tiles, coord)
+			# Treat water tiles as absent so land edges facing water get a full
+			# cliff wall (wall_bottom_y = top_y - ELEVATION_STEP, not zero).
+			for dir in range(6):
+				if neighbor_presence[dir]:
+					var nc := HexCoord.get_neighbor(coord, dir)
+					if (tiles[nc].get("terrain_type", "grass") as String) == "water":
+						neighbor_presence[dir] = false
+						neighbor_elevations[dir] = 0
+			var edge_types := BoardUtils.get_edge_types(tiles, coord)
+			mesh = mesh_builder.build_tile_mesh(
+				elevation,
+				neighbor_elevations,
+				neighbor_presence,
+				edge_types,
+				handler.get_height_offset()
+			)
 
 		var mesh_instance := TileDebugInfo.new()
 		mesh_instance.q = coord.x
@@ -136,7 +182,14 @@ func _spawn_board() -> void:
 		body.position = mesh_instance.position
 
 		var collision_shape := CollisionShape3D.new()
-		collision_shape.shape = mesh.create_trimesh_shape()
+		if handler.use_seafloor_collision() and mesh.get_surface_count() > 1:
+			# Water tiles: build collision from seafloor surface (surface 1) only.
+			var floor_mesh := ArrayMesh.new()
+			var arrays := mesh.surface_get_arrays(1)
+			floor_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+			collision_shape.shape = floor_mesh.create_trimesh_shape()
+		else:
+			collision_shape.shape = mesh.create_trimesh_shape()
 		body.add_child(collision_shape)
 
 		tiles_root.add_child(body)
@@ -145,13 +198,26 @@ func _spawn_board() -> void:
 		var handler: TerrainType = _terrain_types.get(ttype, _terrain_types["grass"])
 		handler.spawn_props(tiles_root, tiles_by_terrain[ttype], shared)
 
+	# Boardwalk pass — named export with fallback to default settings, same as
+	# before the TileFeature refactor so existing scenes work unmodified.
+	var bw: BoardwalkBuilder = boardwalk_builder if boardwalk_builder else BoardwalkBuilder.new()
+	var bw_tiles: Dictionary = bw.collect_tiles(tiles)
+	bw.spawn(tiles_root, bw_tiles, shared)
+
+	# Generic feature pass — additional features (tree, rock, ruins, etc.).
+	for feature: TileFeature in tile_features:
+		var own: Dictionary = feature.collect_tiles(tiles)
+		feature.spawn(tiles_root, own, shared)
+
 func _make_shared_params() -> Dictionary:
 	return {
 		"tile_shader": _tile_shader,
 		"grass_shader": _grass_shader,
 		"grass_overhang_shader": _grass_overhang_shader,
 		"tile_side_shader": _tile_side_shader,
+		"water_shader": _water_shader,
 		"terrain_collision_mask": TERRAIN_COLLISION_MASK,
+		"water_corner_cache": {},
 	}
 
 func _clear_tiles() -> void:

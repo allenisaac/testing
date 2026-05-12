@@ -63,6 +63,17 @@ static func get_edge_type(tiles: Dictionary, coord: Vector2i, dir: int) -> int:
 	var neighbor_elevation := get_neighbor_elevation(tiles, coord, dir, 0)
 	var is_ramp := is_ramp_edge(tile_data, dir)
 
+	# Water neighbours always expose a cliff wall on the land side.
+	# When elevations are equal the standard logic would return FLAT, so we
+	# treat the water tile as absent (wall drops one full ELEVATION_STEP below
+	# the land top).  When water is already lower the standard CLIFF path is
+	# correct and we leave has_n unchanged so wall_bottom_y reaches the water.
+	if has_n:
+		var n_coord := get_neighbor_coord(coord, dir)
+		if (tiles[n_coord].get("terrain_type", "grass") as String) == "water":
+			if neighbor_elevation >= tile_elevation:
+				has_n = false
+
 	return get_edge_type_from_values(
 		tile_elevation,
 		neighbor_elevation,

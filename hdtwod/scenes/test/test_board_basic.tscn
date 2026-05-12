@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://4mvutmlf2src" path="res://scripts/board/shader_globals.gd" id="1_w36jy"]
 [ext_resource type="Script" uid="uid://c0k1cjbabcw6p" path="res://scripts/board/directional_light_3d.gd" id="3_dk0hk"]
 [ext_resource type="Script" uid="uid://div4j03d0yvwv" path="res://scripts/board/terrain/terrain_grass.gd" id="4_ebgco"]
-[ext_resource type="Script" path="res://scripts/board/orbit_camera.gd" id="5_orbit"]
+[ext_resource type="Script" uid="uid://bx7n2qm4vp3tk" path="res://scripts/board/orbit_camera.gd" id="5_orbit"]
 
 [sub_resource type="Environment" id="Environment_evviv"]
 background_color = Color(0.045545302, 0.1347566, 0.114645325, 1)
@@ -63,7 +63,7 @@ cast_shadow = 0
 mesh = SubResource("QuadMesh_rll1y")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewport" unique_id=1603884629]
-transform = Transform3D(0.70710677, 0.24184474, -0.664463, 0, 0.9396926, 0.34202012, 0.70710677, -0.24184474, 0.664463, 20, 3, 0)
+transform = Transform3D(0.7071067, 0.24184474, -0.6644629, 0, 0.9396926, 0.3420201, 0.7071067, -0.24184474, 0.6644629, 20, 3, 0)
 light_color = Color(0.9421533, 0.8429634, 0.7861748, 1)
 shadow_enabled = true
 script = ExtResource("3_dk0hk")

@@ -1,24 +1,80 @@
 {
   "tiles": [
     {
-      "q": 0,
-      "r": 0,
-      "elevation": 1,
+      "q": -6,
+      "r": 1,
+      "elevation": 0,
       "terrain_type": "grass",
       "ramp_edges": [
-        true,
-        true,
         false,
         false,
-        true,
+        false,
+        false,
+        false,
         false
       ]
     },
     {
-      "q": 1,
+      "q": -6,
+      "r": 2,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -6,
+      "r": 3,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -6,
+      "r": 4,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -6,
+      "r": 5,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -5,
       "r": 0,
       "elevation": 0,
-      "terrain_type": "dirt",
+      "terrain_type": "grass",
       "ramp_edges": [
         false,
         false,
@@ -29,8 +85,344 @@
       ]
     },
     {
-      "q": 1,
+      "q": -5,
+      "r": 1,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -5,
+      "r": 2,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -5,
+      "r": 3,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -5,
+      "r": 4,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -5,
+      "r": 5,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -4,
       "r": -1,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -4,
+      "r": 0,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -4,
+      "r": 1,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -4,
+      "r": 2,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -4,
+      "r": 3,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -4,
+      "r": 4,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -4,
+      "r": 5,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -3,
+      "r": -2,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -3,
+      "r": -1,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -3,
+      "r": 0,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -3,
+      "r": 1,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -3,
+      "r": 2,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -3,
+      "r": 3,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -3,
+      "r": 4,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -3,
+      "r": 5,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -2,
+      "r": -3,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -2,
+      "r": -2,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -2,
+      "r": -1,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -2,
+      "r": 0,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -2,
+      "r": 1,
       "elevation": 0,
       "terrain_type": "dirt",
       "ramp_edges": [
@@ -43,7 +435,100 @@
       ]
     },
     {
-      "q": 0,
+      "q": -2,
+      "r": 2,
+      "elevation": 0,
+      "terrain_type": "dirt",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -2,
+      "r": 3,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -2,
+      "r": 4,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -2,
+      "r": 5,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -1,
+      "r": -3,
+      "elevation": 1,
+      "terrain_type": "grass",
+      "tile_feature": "boardwalk",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "edge_features": [
+        "boardwalk",
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "q": -1,
+      "r": -2,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -1,
       "r": -1,
       "elevation": 0,
       "terrain_type": "grass",
@@ -60,6 +545,62 @@
       "q": -1,
       "r": 0,
       "elevation": 0,
+      "terrain_type": "dirt",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -1,
+      "r": 1,
+      "elevation": 0,
+      "terrain_type": "dirt",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -1,
+      "r": 2,
+      "elevation": 0,
+      "terrain_type": "dirt",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -1,
+      "r": 3,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": -1,
+      "r": 4,
+      "elevation": 0,
       "terrain_type": "grass",
       "ramp_edges": [
         false,
@@ -72,6 +613,638 @@
     },
     {
       "q": -1,
+      "r": 5,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 0,
+      "r": -3,
+      "elevation": 1,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "edge_features": [
+        "boardwalk",
+        null,
+        null,
+        "boardwalk",
+        null,
+        null
+      ]
+    },
+    {
+      "q": 0,
+      "r": -2,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 0,
+      "r": -1,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 0,
+      "r": 0,
+      "elevation": 0,
+      "terrain_type": "dirt",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 0,
+      "r": 1,
+      "elevation": 0,
+      "terrain_type": "dirt",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 0,
+      "r": 2,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 0,
+      "r": 3,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 0,
+      "r": 4,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 0,
+      "r": 5,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 1,
+      "r": -3,
+      "elevation": 1,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "edge_features": [
+        null,
+        null,
+        null,
+        "boardwalk",
+        null,
+        null
+      ]
+    },
+    {
+      "q": 1,
+      "r": -2,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 1,
+      "r": -1,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 1,
+      "r": 0,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 1,
+      "r": 1,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 1,
+      "r": 2,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 1,
+      "r": 3,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 1,
+      "r": 4,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 1,
+      "r": 5,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 2,
+      "r": -3,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 2,
+      "r": -2,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 2,
+      "r": -1,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 2,
+      "r": 0,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 2,
+      "r": 1,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 2,
+      "r": 2,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 2,
+      "r": 3,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 2,
+      "r": 4,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 3,
+      "r": -3,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 3,
+      "r": -2,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 3,
+      "r": -1,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 3,
+      "r": 0,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 3,
+      "r": 1,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 3,
+      "r": 2,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 3,
+      "r": 3,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 3,
+      "r": 4,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 4,
+      "r": -2,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 4,
+      "r": -1,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 4,
+      "r": 0,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 4,
+      "r": 1,
+      "elevation": 0,
+      "terrain_type": "water",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 4,
+      "r": 2,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 4,
+      "r": 3,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 5,
+      "r": -2,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 5,
+      "r": -1,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 5,
+      "r": 0,
+      "elevation": 0,
+      "terrain_type": "grass",
+      "ramp_edges": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "q": 5,
       "r": 1,
       "elevation": 0,
       "terrain_type": "grass",
@@ -86,21 +1259,7 @@
     },
     {
       "q": 0,
-      "r": 1,
-      "elevation": 0,
-      "terrain_type": "grass",
-      "ramp_edges": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    },
-    {
-      "q": 3,
-      "r": 0,
+      "r": -4,
       "elevation": 1,
       "terrain_type": "grass",
       "ramp_edges": [
@@ -113,10 +1272,11 @@
       ]
     },
     {
-      "q": 4,
-      "r": 0,
-      "elevation": 0,
+      "q": 0,
+      "r": -5,
+      "elevation": 1,
       "terrain_type": "grass",
+      "tile_feature":"boardwalk",
       "ramp_edges": [
         false,
         false,
@@ -124,76 +1284,14 @@
         false,
         false,
         false
-      ]
-    },
-    {
-      "q": 4,
-      "r": -1,
-      "elevation": 0,
-      "terrain_type": "grass",
-      "ramp_edges": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    },
-    {
-      "q": 3,
-      "r": -1,
-      "elevation": 0,
-      "terrain_type": "grass",
-      "ramp_edges": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    },
-    {
-      "q": 2,
-      "r": 0,
-      "elevation": 0,
-      "terrain_type": "grass",
-      "ramp_edges": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    },
-    {
-      "q": 2,
-      "r": 1,
-      "elevation": 0,
-      "terrain_type": "grass",
-      "ramp_edges": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    },
-    {
-      "q": 3,
-      "r": 1,
-      "elevation": 0,
-      "terrain_type": "grass",
-      "ramp_edges": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
+      ],
+      "edge_features": [
+        "boardwalk",
+        null,
+        "boardwalk",
+        null,
+        "boardwalk",
+        null
       ]
     }
   ]

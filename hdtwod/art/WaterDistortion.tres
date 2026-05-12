@@ -1,0 +1,10 @@
+[gd_resource type="NoiseTexture2D" format=3 uid="uid://water_distortion_001"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_wdist"]
+noise_type = 3
+seed = 99
+frequency = 0.12
+
+[resource]
+noise = SubResource("FastNoiseLite_wdist")
+seamless = true
